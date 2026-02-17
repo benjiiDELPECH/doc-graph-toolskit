@@ -27,8 +27,8 @@ The easiest way to run the application is using Docker Compose:
 
 ```bash
 # Clone the repository
-git clone https://github.com/benjiiDELPECH/doc-graph-toolskit.git
-cd doc-graph-toolskit
+git clone https://github.com/benjiiDELPECH/doc-graph-toolkit.git
+cd doc-graph-toolkit
 
 # Start all services
 docker-compose up --build
