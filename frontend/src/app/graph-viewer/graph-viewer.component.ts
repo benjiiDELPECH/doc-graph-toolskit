@@ -4,6 +4,24 @@ import { DataSet } from 'vis-data';
 import { GraphData, NodeData, EdgeData } from '../api.service';
 import { CommonModule } from '@angular/common';
 
+interface VisNode {
+  id: string;
+  label: string;
+  title?: string;
+  color?: string;
+  type?: string;
+  evidence?: any;
+}
+
+interface VisEdge {
+  id: string;
+  from: string;
+  to: string;
+  label: string;
+  title?: string;
+  evidence?: any;
+}
+
 @Component({
   selector: 'app-graph-viewer',
   standalone: true,
@@ -15,6 +33,8 @@ export class GraphViewerComponent implements AfterViewInit {
   @ViewChild('networkContainer', { static: false }) networkContainer!: ElementRef;
   
   private network?: Network;
+  private nodesDataSet?: DataSet<VisNode>;
+  private edgesDataSet?: DataSet<VisEdge>;
   selectedNode: NodeData | null = null;
   selectedEdge: EdgeData | null = null;
 
@@ -24,15 +44,15 @@ export class GraphViewerComponent implements AfterViewInit {
 
   private initNetwork() {
     const container = this.networkContainer.nativeElement;
-    const nodes = new DataSet([]);
-    const edges = new DataSet([]);
+    this.nodesDataSet = new DataSet<VisNode>([]);
+    this.edgesDataSet = new DataSet<VisEdge>([]);
 
     const data = {
-      nodes: nodes,
-      edges: edges
+      nodes: this.nodesDataSet,
+      edges: this.edgesDataSet
     };
 
-    const options = {
+    const options: any = {
       nodes: {
         shape: 'dot',
         size: 16,
@@ -52,7 +72,9 @@ export class GraphViewerComponent implements AfterViewInit {
           }
         },
         smooth: {
-          type: 'continuous'
+          enabled: true,
+          type: 'continuous',
+          roundness: 0.5
         },
         font: {
           size: 12,
@@ -76,15 +98,16 @@ export class GraphViewerComponent implements AfterViewInit {
     this.network = new Network(container, data, options);
 
     // Add event listeners
-    this.network.on('selectNode', (params) => {
+    this.network.on('selectNode', (params: any) => {
       if (params.nodes.length > 0) {
         const nodeId = params.nodes[0];
-        const node = nodes.get(nodeId);
+        const nodeResult = this.nodesDataSet?.get(nodeId);
+        const node = Array.isArray(nodeResult) ? nodeResult[0] : nodeResult;
         if (node) {
           this.selectedNode = {
             id: node.id,
             label: node.label,
-            type: node.type,
+            type: node.type || '',
             evidence: node.evidence
           };
           this.selectedEdge = null;
@@ -92,10 +115,11 @@ export class GraphViewerComponent implements AfterViewInit {
       }
     });
 
-    this.network.on('selectEdge', (params) => {
+    this.network.on('selectEdge', (params: any) => {
       if (params.edges.length > 0) {
         const edgeId = params.edges[0];
-        const edge = edges.get(edgeId);
+        const edgeResult = this.edgesDataSet?.get(edgeId);
+        const edge = Array.isArray(edgeResult) ? edgeResult[0] : edgeResult;
         if (edge) {
           this.selectedEdge = {
             source: edge.from,
@@ -118,7 +142,7 @@ export class GraphViewerComponent implements AfterViewInit {
   }
 
   updateGraph(graphData: GraphData) {
-    if (!this.network) return;
+    if (!this.network || !this.nodesDataSet || !this.edgesDataSet) return;
 
     const typeColors: { [key: string]: string } = {
       'Person': '#FF6B6B',
@@ -130,7 +154,7 @@ export class GraphViewerComponent implements AfterViewInit {
       'Term': '#DDA15E'
     };
 
-    const nodes = graphData.nodes.map(node => ({
+    const nodes: VisNode[] = graphData.nodes.map(node => ({
       id: node.id,
       label: node.label,
       title: `Type: ${node.type}\nPage: ${node.evidence.page}`,
@@ -139,7 +163,7 @@ export class GraphViewerComponent implements AfterViewInit {
       evidence: node.evidence
     }));
 
-    const edges = graphData.edges.map((edge, index) => ({
+    const edges: VisEdge[] = graphData.edges.map((edge, index) => ({
       id: `edge-${index}`,
       from: edge.source,
       to: edge.target,
@@ -148,18 +172,16 @@ export class GraphViewerComponent implements AfterViewInit {
       evidence: edge.evidence
     }));
 
-    const data = this.network.body.data;
-    data.nodes.clear();
-    data.edges.clear();
-    data.nodes.add(nodes);
-    data.edges.add(edges);
+    this.nodesDataSet.clear();
+    this.edgesDataSet.clear();
+    this.nodesDataSet.add(nodes);
+    this.edgesDataSet.add(edges);
   }
 
   clearGraph() {
-    if (this.network) {
-      const data = this.network.body.data;
-      data.nodes.clear();
-      data.edges.clear();
+    if (this.nodesDataSet && this.edgesDataSet) {
+      this.nodesDataSet.clear();
+      this.edgesDataSet.clear();
     }
     this.selectedNode = null;
     this.selectedEdge = null;
