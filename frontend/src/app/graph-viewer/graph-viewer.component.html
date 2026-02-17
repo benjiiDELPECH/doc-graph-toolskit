@@ -1,0 +1,43 @@
+<div class="graph-container">
+  <div #networkContainer class="network-canvas"></div>
+  
+  <div class="info-panel" *ngIf="selectedNode || selectedEdge">
+    <div class="info-content" *ngIf="selectedNode">
+      <h3>Node Details</h3>
+      <div class="detail-item">
+        <strong>Name:</strong> {{ selectedNode.label }}
+      </div>
+      <div class="detail-item">
+        <strong>Type:</strong> {{ selectedNode.type }}
+      </div>
+      <div class="detail-item">
+        <strong>Page:</strong> {{ selectedNode.evidence.page }}
+      </div>
+      <div class="detail-item">
+        <strong>Evidence:</strong>
+        <div class="evidence-text">{{ selectedNode.evidence.snippet }}</div>
+      </div>
+    </div>
+    
+    <div class="info-content" *ngIf="selectedEdge">
+      <h3>Edge Details</h3>
+      <div class="detail-item">
+        <strong>From:</strong> {{ selectedEdge.source }}
+      </div>
+      <div class="detail-item">
+        <strong>To:</strong> {{ selectedEdge.target }}
+      </div>
+      <div class="detail-item">
+        <strong>Relationship:</strong> {{ selectedEdge.label }}
+      </div>
+      <div class="detail-item">
+        <strong>Page:</strong> {{ selectedEdge.evidence.page }}
+      </div>
+      <div class="detail-item">
+        <strong>Evidence:</strong>
+        <div class="evidence-text">{{ selectedEdge.evidence.snippet }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+

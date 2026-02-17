@@ -1,0 +1,82 @@
+<div class="app-container">
+  <header>
+    <h1>{{ title }}</h1>
+    <p>Multi-pass PDF Document Processing with Graph Visualization</p>
+  </header>
+
+  <main>
+    <div class="upload-section">
+      <div class="upload-card">
+        <h2>Upload PDF Document</h2>
+        
+        <div class="file-input-wrapper">
+          <input 
+            type="file" 
+            id="file-input" 
+            accept=".pdf" 
+            (change)="onFileSelected($event)"
+            [disabled]="processing"
+          />
+          <label for="file-input" class="file-label">
+            <span *ngIf="!selectedFile">Choose PDF File</span>
+            <span *ngIf="selectedFile">{{ selectedFile.name }}</span>
+          </label>
+        </div>
+
+        <button 
+          class="process-btn" 
+          (click)="processDocument()" 
+          [disabled]="!selectedFile || processing"
+        >
+          <span *ngIf="!processing">Process Document</span>
+          <span *ngIf="processing">Processing...</span>
+        </button>
+
+        <button 
+          class="clear-btn" 
+          (click)="clearGraph()" 
+          [disabled]="processing"
+        >
+          Clear
+        </button>
+
+        <div class="message error" *ngIf="error">
+          {{ error }}
+        </div>
+
+        <div class="message success" *ngIf="result && result.status === 'success'">
+          {{ result.message }}
+        </div>
+
+        <div class="message warning" *ngIf="result && result.status === 'warning'">
+          {{ result.message }}
+        </div>
+      </div>
+
+      <div class="ontology-card" *ngIf="result">
+        <h3>Induced Ontology</h3>
+        <div class="ontology-section">
+          <h4>Entity Types ({{ result.ontology.entityTypes.length }})</h4>
+          <div class="tag-list">
+            <span class="tag" *ngFor="let type of result.ontology.entityTypes">{{ type }}</span>
+          </div>
+        </div>
+        <div class="ontology-section">
+          <h4>Relation Types ({{ result.ontology.relationTypes.length }})</h4>
+          <div class="tag-list">
+            <span class="tag relation" *ngFor="let type of result.ontology.relationTypes">{{ type }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="graph-section">
+      <h2>Knowledge Graph Visualization</h2>
+      <app-graph-viewer></app-graph-viewer>
+    </div>
+  </main>
+
+  <footer>
+    <p>DocGraph POC - Powered by Angular, Spring Boot, Kotlin, Apache Tika & Neo4j</p>
+  </footer>
+</div>
