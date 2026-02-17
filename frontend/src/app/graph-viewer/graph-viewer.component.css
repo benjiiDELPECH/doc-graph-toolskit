@@ -1,0 +1,53 @@
+.graph-container {
+  display: flex;
+  width: 100%;
+  height: 600px;
+  position: relative;
+}
+
+.network-canvas {
+  flex: 1;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #fafafa;
+}
+
+.info-panel {
+  width: 300px;
+  margin-left: 20px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  overflow-y: auto;
+}
+
+.info-content h3 {
+  margin-top: 0;
+  color: #333;
+  font-size: 18px;
+  border-bottom: 2px solid #4CAF50;
+  padding-bottom: 10px;
+}
+
+.detail-item {
+  margin-bottom: 15px;
+}
+
+.detail-item strong {
+  display: block;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+.evidence-text {
+  background-color: #fff;
+  padding: 10px;
+  border-left: 3px solid #4CAF50;
+  font-style: italic;
+  color: #666;
+  font-size: 13px;
+  line-height: 1.5;
+  max-height: 150px;
+  overflow-y: auto;
+}

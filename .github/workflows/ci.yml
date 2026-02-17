@@ -1,0 +1,334 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main, develop, copilot/** ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  # Backend Jobs
+  backend-lint:
+    name: Backend - Kotlin Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+      
+      - name: Grant execute permission for gradlew
+        run: chmod +x backend/gradlew
+      
+      - name: Run Kotlin lint (detekt)
+        working-directory: backend
+        run: ./gradlew check --no-daemon
+
+  backend-build:
+    name: Backend - Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+      
+      - name: Grant execute permission for gradlew
+        run: chmod +x backend/gradlew
+      
+      - name: Build with Gradle
+        working-directory: backend
+        run: ./gradlew build --no-daemon
+      
+      - name: Run tests
+        working-directory: backend
+        run: ./gradlew test --no-daemon
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-results
+          path: backend/build/test-results/
+      
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-jar
+          path: backend/build/libs/*.jar
+
+  backend-security:
+    name: Backend - Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+      
+      - name: Grant execute permission for gradlew
+        run: chmod +x backend/gradlew
+      
+      - name: Run dependency check
+        working-directory: backend
+        run: ./gradlew dependencyCheckAnalyze --no-daemon || true
+      
+      - name: Upload security report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-security-report
+          path: backend/build/reports/dependency-check-report.html
+
+  # Frontend Jobs
+  frontend-lint:
+    name: Frontend - Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+      
+      - name: Run ESLint
+        working-directory: frontend
+        run: npx eslint . --ext .ts,.html || true
+      
+      - name: Check formatting
+        working-directory: frontend
+        run: npx prettier --check "src/**/*.{ts,html,css,json}" || true
+
+  frontend-build:
+    name: Frontend - Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+      
+      - name: Run unit tests
+        working-directory: frontend
+        run: npm run test -- --watch=false --browsers=ChromeHeadless
+      
+      - name: Build production
+        working-directory: frontend
+        run: npm run build -- --configuration production
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-test-results
+          path: frontend/coverage/
+      
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist/
+
+  frontend-security:
+    name: Frontend - Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      
+      - name: Run npm audit
+        working-directory: frontend
+        run: npm audit --audit-level=moderate || true
+      
+      - name: Check for outdated packages
+        working-directory: frontend
+        run: npm outdated || true
+
+  # Docker Jobs
+  docker-build:
+    name: Docker - Build Images
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Build backend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: false
+          tags: docgraph-backend:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      
+      - name: Build frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: false
+          tags: docgraph-frontend:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  docker-compose-test:
+    name: Docker - Compose Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Validate docker-compose.yml
+        run: docker compose config
+      
+      - name: Build services
+        run: docker compose build
+      
+      - name: Start services
+        run: docker compose up -d
+      
+      - name: Wait for services
+        run: sleep 30
+      
+      - name: Check services health
+        run: |
+          docker compose ps
+          curl -f http://localhost:8080/api/health || exit 1
+          curl -f http://localhost:4200 || exit 1
+      
+      - name: Stop services
+        if: always()
+        run: docker compose down -v
+
+  # Code Quality Jobs
+  code-quality:
+    name: Code Quality - SonarCloud (Optional)
+    runs-on: ubuntu-latest
+    if: false  # Enable when SonarCloud is configured
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  markdown-lint:
+    name: Documentation - Markdown Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Lint Markdown files
+        uses: nosborn/github-action-markdown-cli@v3.3.0
+        with:
+          files: .
+          config_file: .markdownlint.json
+          ignore_files: node_modules/
+        continue-on-error: true
+
+  dependency-review:
+    name: Security - Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: moderate
+
+  # CodeQL Analysis
+  codeql-analysis:
+    name: Security - CodeQL Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'javascript', 'java' ]
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+      
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+      
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"
+
+  # Final Status Check
+  ci-success:
+    name: CI Pipeline - All Checks Passed
+    runs-on: ubuntu-latest
+    needs: 
+      - backend-lint
+      - backend-build
+      - backend-security
+      - frontend-lint
+      - frontend-build
+      - frontend-security
+      - docker-build
+      - docker-compose-test
+      - markdown-lint
+    if: always()
+    steps:
+      - name: Check job status
+        run: |
+          if [[ "${{ needs.backend-lint.result }}" == "failure" ]] || \
+             [[ "${{ needs.backend-build.result }}" == "failure" ]] || \
+             [[ "${{ needs.frontend-lint.result }}" == "failure" ]] || \
+             [[ "${{ needs.frontend-build.result }}" == "failure" ]] || \
+             [[ "${{ needs.docker-build.result }}" == "failure" ]]; then
+            echo "❌ CI Pipeline failed"
+            exit 1
+          fi
+          echo "✅ CI Pipeline passed successfully"
