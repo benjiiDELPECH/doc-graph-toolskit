@@ -1,11 +1,15 @@
 # DocGraph POC - Document Graph Toolkit
 
+[![CI Pipeline](https://github.com/benjiiDELPECH/doc-graph-toolskit/workflows/CI%20Pipeline/badge.svg)](https://github.com/benjiiDELPECH/doc-graph-toolskit/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/benjiiDELPECH/doc-graph-toolskit/workflows/CodeQL/badge.svg)](https://github.com/benjiiDELPECH/doc-graph-toolskit/actions/workflows/ci.yml)
+[![Release](https://github.com/benjiiDELPECH/doc-graph-toolskit/workflows/Release/badge.svg)](https://github.com/benjiiDELPECH/doc-graph-toolskit/actions/workflows/release.yml)
+
 A complete monorepo application for processing PDF documents with multi-pass workflow, extracting knowledge graphs, and visualizing them in an interactive UI.
 
 ## Architecture
 
 ### Frontend
-- **Angular 17** with standalone components
+- **Angular 19.2.18** with standalone components
 - **vis-network** for interactive graph visualization
 - File upload and real-time graph rendering
 - Evidence display for entities and relations
