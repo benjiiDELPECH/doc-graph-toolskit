@@ -33,7 +33,7 @@ doc-graph-toolkit/
 │   ├── Dockerfile              # Multi-stage Docker build
 │   └── nginx.conf              # Nginx configuration
 ├── sample-data/                # Sample PDF and test data
-├── docker-compose.yml          # Docker orchestration
+├── docker compose.yml          # Docker orchestration
 ├── README.md                   # Main documentation
 ├── USAGE.md                    # User guide
 ├── DOCKER.md                   # Docker deployment guide
@@ -296,7 +296,7 @@ docker run -d -p 7474:7474 -p 7687:7687 neo4j:5.15.0
 
 ### Docker Compose (Recommended)
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
 ### Production Deployment
@@ -319,7 +319,7 @@ docker-compose up --build
 - Neo4j graph storage
 - REST API endpoints
 - Dockerfiles for all services
-- docker-compose.yml for orchestration
+- docker compose.yml for orchestration
 - Basic graph UI with interactivity
 
 ✅ **Quality Requirements Met:**
@@ -347,7 +347,7 @@ The modular architecture allows for easy extension and customization, making it 
 # Clone and run
 git clone https://github.com/benjiiDELPECH/doc-graph-toolkit.git
 cd doc-graph-toolkit
-docker-compose up --build
+docker compose up --build
 
 # Access at http://localhost:4200
 ```

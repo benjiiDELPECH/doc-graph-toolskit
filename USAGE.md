@@ -31,7 +31,7 @@ git clone https://github.com/benjiiDELPECH/doc-graph-toolkit.git
 cd doc-graph-toolkit
 
 # Start all services
-docker-compose up --build
+docker compose up --build
 
 # Wait for all services to start (about 2-3 minutes)
 # You'll see messages indicating services are ready
@@ -306,16 +306,16 @@ lsof -i :7474  # Neo4j HTTP
 lsof -i :7687  # Neo4j Bolt
 
 # Stop and remove containers
-docker-compose down -v
+docker compose down -v
 
 # Rebuild and restart
-docker-compose up --build --force-recreate
+docker compose up --build --force-recreate
 ```
 
 **Neo4j connection errors:**
 ```bash
 # Wait for Neo4j to fully start (check health)
-docker-compose logs neo4j
+docker compose logs neo4j
 
 # Verify Neo4j is accessible
 curl http://localhost:7474
@@ -402,7 +402,7 @@ Frontend (`frontend/src/app/api.service.ts`):
 private apiUrl = 'http://localhost:8080/api';
 ```
 
-Docker Compose (`docker-compose.yml`):
+Docker Compose (`docker compose.yml`):
 ```yaml
 environment:
   - NEO4J_dbms_memory_pagecache_size=512M

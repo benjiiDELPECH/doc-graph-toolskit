@@ -22,7 +22,7 @@ Comprehensive continuous integration pipeline that runs on every push and pull r
 
 #### Docker
 - **docker-build**: Build Docker images for backend and frontend
-- **docker-compose-test**: Test full stack with docker-compose
+- **docker-compose-test**: Test full stack with Docker Compose
 
 #### Code Quality
 - **markdown-lint**: Lint documentation files
@@ -121,8 +121,8 @@ npm run lint
 
 #### Docker Build
 ```bash
-docker-compose build
-docker-compose up -d
+docker compose build
+docker compose up -d
 ```
 
 ### Creating a Release

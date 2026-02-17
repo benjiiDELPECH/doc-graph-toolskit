@@ -214,26 +214,26 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: Validate docker-compose.yml
-        run: docker-compose config
+        run: docker compose config
       
       - name: Build services
-        run: docker-compose build
+        run: docker compose build
       
       - name: Start services
-        run: docker-compose up -d
+        run: docker compose up -d
       
       - name: Wait for services
         run: sleep 30
       
       - name: Check services health
         run: |
-          docker-compose ps
+          docker compose ps
           curl -f http://localhost:8080/api/health || exit 1
           curl -f http://localhost:4200 || exit 1
       
       - name: Stop services
         if: always()
-        run: docker-compose down -v
+        run: docker compose down -v
 
   # Code Quality Jobs
   code-quality:

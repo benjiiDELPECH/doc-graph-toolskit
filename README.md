@@ -47,7 +47,7 @@ A complete monorepo application for processing PDF documents with multi-pass wor
 
 ```bash
 # Build and start all services
-docker-compose up --build
+docker compose up --build
 
 # Access the application
 # Frontend: http://localhost:4200
@@ -138,7 +138,7 @@ docgraph-poc/
 │   ├── package.json
 │   ├── nginx.conf
 │   └── Dockerfile
-└── docker-compose.yml       # Docker orchestration
+└── docker compose.yml       # Docker orchestration
 ```
 
 ## Features
@@ -180,7 +180,7 @@ docgraph-poc/
 
 ## Example Usage
 
-1. Start the application with `docker-compose up`
+1. Start the application with `docker compose up`
 2. Navigate to http://localhost:4200
 3. Click "Choose PDF File" and select a PDF document
 4. Click "Process Document" to start the multi-pass workflow

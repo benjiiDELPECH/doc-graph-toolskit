@@ -2,6 +2,8 @@
 
 This guide explains the Docker and Docker Compose setup for the DocGraph POC application.
 
+> **Note**: This project uses Docker Compose V2 syntax (`docker compose` command). If you have an older version of Docker, you may need to use `docker-compose` (with hyphen) or upgrade to Docker Desktop 3.4+ / Docker Engine 20.10.13+.
+
 ## Architecture
 
 The application consists of three containerized services:
@@ -49,58 +51,58 @@ The application consists of three containerized services:
 
 ```bash
 # Build and start in foreground
-docker-compose up --build
+docker compose up --build
 
 # Build and start in background (detached)
-docker-compose up --build -d
+docker compose up --build -d
 
 # View logs
-docker-compose logs -f
+docker compose logs -f
 
 # View logs for specific service
-docker-compose logs -f backend
+docker compose logs -f backend
 ```
 
 ### Stop Services
 
 ```bash
 # Stop services (preserves data)
-docker-compose stop
+docker compose stop
 
 # Stop and remove containers (preserves volumes)
-docker-compose down
+docker compose down
 
 # Stop, remove containers, and delete volumes (clean slate)
-docker-compose down -v
+docker compose down -v
 ```
 
 ### Rebuild Services
 
 ```bash
 # Rebuild specific service
-docker-compose build backend
+docker compose build backend
 
 # Rebuild without cache
-docker-compose build --no-cache
+docker compose build --no-cache
 
 # Rebuild and restart
-docker-compose up --build --force-recreate
+docker compose up --build --force-recreate
 ```
 
 ### Service Management
 
 ```bash
 # Start specific service
-docker-compose start backend
+docker compose start backend
 
 # Restart specific service
-docker-compose restart frontend
+docker compose restart frontend
 
 # View service status
-docker-compose ps
+docker compose ps
 
 # Execute command in running container
-docker-compose exec backend /bin/bash
+docker compose exec backend /bin/bash
 ```
 
 ## Dockerfile Details
@@ -218,7 +220,7 @@ docker volume inspect doc-graph-toolskit_neo4j_data
 ### Backup Neo4j Data
 ```bash
 # Create backup
-docker-compose exec neo4j neo4j-admin database dump neo4j \
+docker compose exec neo4j neo4j-admin database dump neo4j \
   --to-path=/backups
 
 # Copy from container
@@ -231,7 +233,7 @@ docker cp docgraph-neo4j:/backups/neo4j.dump ./backup.dump
 docker cp ./backup.dump docgraph-neo4j:/backups/
 
 # Restore
-docker-compose exec neo4j neo4j-admin database load neo4j \
+docker compose exec neo4j neo4j-admin database load neo4j \
   --from-path=/backups/neo4j.dump
 ```
 
@@ -241,14 +243,14 @@ docker-compose exec neo4j neo4j-admin database load neo4j \
 
 ```bash
 # Check container logs
-docker-compose logs [service-name]
+docker compose logs [service-name]
 
 # Check if ports are in use
 netstat -tulpn | grep -E '4200|8080|7474|7687'
 
 # Remove and recreate
-docker-compose down -v
-docker-compose up --build
+docker compose down -v
+docker compose up --build
 ```
 
 ### Out of Disk Space
@@ -269,13 +271,13 @@ docker system prune -a --volumes
 ```bash
 # Use Docker BuildKit
 export DOCKER_BUILDKIT=1
-docker-compose build
+docker compose build
 
 # Build specific service only
-docker-compose build backend
+docker compose build backend
 
 # Use build cache
-docker-compose build --parallel
+docker compose build --parallel
 ```
 
 ### Network Issues
@@ -285,8 +287,8 @@ docker-compose build --parallel
 docker network inspect doc-graph-toolskit_docgraph-network
 
 # Test connectivity between containers
-docker-compose exec backend ping neo4j
-docker-compose exec frontend ping backend
+docker compose exec backend ping neo4j
+docker compose exec frontend ping backend
 ```
 
 ## Production Deployment
@@ -300,7 +302,7 @@ BACKEND_PORT=8080
 FRONTEND_PORT=80
 ```
 
-Use in docker-compose:
+Use in docker compose:
 ```yaml
 environment:
   - NEO4J_AUTH=neo4j/${NEO4J_PASSWORD}
@@ -373,7 +375,7 @@ docker stats docgraph-backend
 
 ```bash
 # Check all containers health
-docker-compose ps
+docker compose ps
 
 # Inspect specific service
 docker inspect --format='{{.State.Health.Status}}' docgraph-backend
@@ -397,7 +399,7 @@ services:
 
 Deploy:
 ```bash
-docker stack deploy -c docker-compose.yml docgraph
+docker stack deploy -c docker compose.yml docgraph
 ```
 
 ## Kubernetes Alternative
@@ -406,7 +408,7 @@ For Kubernetes deployment, generate manifests:
 
 ```bash
 # Using kompose
-kompose convert -f docker-compose.yml
+kompose convert -f docker compose.yml
 
 # Or manually create k8s manifests
 kubectl create deployment backend --image=docgraph-backend:latest

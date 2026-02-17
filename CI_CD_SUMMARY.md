@@ -48,8 +48,8 @@ Added comprehensive GitHub Actions workflows for continuous integration, securit
    - BuildX with layer caching
    - Backend and frontend images
    
-2. **docker-compose-test** - Integration test
-   - Validates docker-compose.yml
+2. **docker compose-test** - Integration test
+   - Validates docker compose.yml
    - Starts all services
    - Health check verification
    - Tests API endpoints
@@ -300,9 +300,9 @@ npm audit
 
 #### Docker
 ```bash
-docker-compose build
-docker-compose up -d
-docker-compose ps
+docker compose build
+docker compose up -d
+docker compose ps
 ```
 
 ### Creating a Release
