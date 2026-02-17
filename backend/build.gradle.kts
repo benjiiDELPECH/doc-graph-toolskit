@@ -25,9 +25,9 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     
-    // Apache Tika for PDF parsing
-    implementation("org.apache.tika:tika-core:2.9.1")
-    implementation("org.apache.tika:tika-parsers-standard-package:2.9.1")
+    // Apache Tika for PDF parsing - Updated to 3.2.2 to fix XXE vulnerability
+    implementation("org.apache.tika:tika-core:3.2.2")
+    implementation("org.apache.tika:tika-parsers-standard-package:3.2.2")
     
     // Neo4j
     implementation("org.springframework.boot:spring-boot-starter-data-neo4j")

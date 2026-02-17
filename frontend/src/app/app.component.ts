@@ -1,5 +1,4 @@
 import { Component, ViewChild } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { GraphViewerComponent } from './graph-viewer/graph-viewer.component';
@@ -8,7 +7,7 @@ import { ApiService, ProcessingResult } from './api.service';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, CommonModule, HttpClientModule, GraphViewerComponent],
+  imports: [CommonModule, HttpClientModule, GraphViewerComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
