@@ -34,8 +34,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-neo4j")
     
     // Coroutines for multi-pass workflow
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.10.2")
     
     // Testing
     testImplementation("org.springframework.boot:spring-boot-starter-test")
