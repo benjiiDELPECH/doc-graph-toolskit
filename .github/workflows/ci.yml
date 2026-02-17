@@ -54,13 +54,13 @@ jobs:
       
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: backend-test-results
           path: backend/build/test-results/
       
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: backend-jar
           path: backend/build/libs/*.jar
@@ -87,7 +87,7 @@ jobs:
       
       - name: Upload security report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: backend-security-report
           path: backend/build/reports/dependency-check-report.html
@@ -145,13 +145,13 @@ jobs:
       
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: frontend-test-results
           path: frontend/coverage/
       
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: frontend-dist
           path: frontend/dist/
